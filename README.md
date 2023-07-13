@@ -1,12 +1,12 @@
-# Abbey Starter Kit Quickstart Example
+# Abbey Starter Kit AWS IAM
 
 This example shows how to create a single step Grant Kit workflow.
-The example features requesting access to a [Null Resource](https://registry.terraform.io/providers/hashicorp/null/latest).
+The example features requesting membership to an [IAM Group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_group_membership).
 from multiple reviewers, requiring only `one_of` the reviewers to approve the access.
 
 ## Usage
 
-Visit this [Starter Kit's docs](https://docs.abbey.io/getting-started/quickstart) for a short usage walkthrough.
+Visit this [Starter Kit's docs](https://docs.abbey.io/integrations/identity-providers/amazon-web-services-aws) for a short usage walkthrough.
 
 ## :books: Learn More
 

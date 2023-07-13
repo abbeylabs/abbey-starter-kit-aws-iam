@@ -13,14 +13,9 @@ terraform {
       version = "0.2.2"
     }
 
-    null = {
-      source = "hashicorp/null"
-      version = "3.2.1"
-    }
-
-    random = {
-      source = "hashicorp/random"
-      version = "3.4.3"
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.16"
     }
   }
 }
@@ -30,18 +25,14 @@ provider "abbey" {
   bearer_auth = var.abbey_token
 }
 
-provider "null" {
-  # Configuration options
+provider "aws" {
+  region = "us-west-2"
 }
 
-provider "random" {
-  # Configuration options
-}
-
-resource "abbey_grant_kit" "null_grant" {
-  name = "Null_grant"
+resource "abbey_grant_kit" "IAM_membership" {
+  name = "IAM_membership"
   description = <<-EOT
-    Grants access to a Null Resource.
+    Grants membership to an IAM Group.
     This Grant Kit uses a single-step Grant Workflow that requires only a single reviewer
     from a list of reviewers to approve access.
   EOT
@@ -62,9 +53,12 @@ resource "abbey_grant_kit" "null_grant" {
   output = {
     # Replace with your own path pointing to where you want your access changes to manifest.
     # Path is an RFC 3986 URI, such as `github://{organization}/{repo}/path/to/file.tf`.
-    location = "github://replace-me-with-organization/replace-me-with-repo/access.tf"
+    location = "github://replace-me-with-organization/replace-me-with-repo/access.tf" #CHANGEME
     append = <<-EOT
       resource "null_resource" "null_grant_${random_pet.random_pet_name.id}" {
+      resource "aws_iam_user_group_membership" "user_{{ .data.system.abbey.secondary_identities.aws_iam.name }}_group_${aws_iam_group.group.name}" {
+        user = {{ .data.system.abbey.secondary_identities.aws_iam.name }}
+        groups = ["${data.aws_iam_group.group1.name}"]
       }
     EOT
   }
@@ -77,13 +71,18 @@ resource "abbey_identity" "user_1" {
     abbey = [
       {
         type  = "AuthId"
-        value = "replace-me@example.com"
+        value = "replace-me@example.com" #CHANGEME
       }
     ]
-  })
+
+    aws_iam = [
+      {
+        name = "ReplaceWithAWSIamName" #CHANGEME
+      })
 }
 
-resource "random_pet" "random_pet_name" {
-  length = 5
-  separator = "_"
+data "aws_iam_group" "group1" {
+  name = "group1"
 }
+
+
