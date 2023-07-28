@@ -10,7 +10,7 @@ terraform {
   required_providers {
     abbey = {
       source = "abbeylabs/abbey"
-      version = "0.2.2"
+      version = "0.2.4"
     }
 
     aws = {
@@ -41,9 +41,6 @@ resource "abbey_grant_kit" "IAM_membership" {
     steps = [
       {
         reviewers = {
-          # Typically uses your Primary Identity.
-          # For this local example, you can pass in an arbitrary string.
-          # For more information on what a Primary Identity is, visit https://docs.abbey.io.
           one_of = ["replace-me@example.com"]
         }
       }
@@ -56,7 +53,7 @@ resource "abbey_grant_kit" "IAM_membership" {
     location = "github://replace-me-with-organization/replace-me-with-repo/access.tf" #CHANGEME
     append = <<-EOT
       resource "aws_iam_user_group_membership" "user_{{ .data.system.abbey.secondary_identities.aws_iam.name }}_group_${data.aws_iam_group.group1.group_name}" {
-        user = "{{ .data.system.abbey.secondary_identities.aws_iam.name }}"
+        user = "{{ .data.system.abbey.identities.aws_iam.name }}"
         groups = ["${data.aws_iam_group.group1.group_name}"]
       }
     EOT
@@ -64,22 +61,13 @@ resource "abbey_grant_kit" "IAM_membership" {
 }
 
 resource "abbey_identity" "user_1" {
-  name = "User 1"
-
-  linked = jsonencode({
-    abbey = [
-      {
-        type  = "AuthId"
-        value = "replace-me@example.com" #CHANGEME
-      }
-    ]
-
-    aws_iam = [
-      {
-        name = "ReplaceWithAWSIamName" #CHANGEME
-      }
-    ]
-  })
+  abbey_account = "replace-me@example.com"
+  source = "aws_iam"
+  metadata = jsonencode(
+    {
+      name = "ReplaceWithAWSIamName" #CHANGEME
+    }
+  )
 }
 
 data "aws_iam_group" "group1" {
